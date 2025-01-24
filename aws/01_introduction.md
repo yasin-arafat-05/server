@@ -129,6 +129,129 @@
 <br>
 <br>
 
-# `#01 Virtualization, Hypervisor, Type of Hypervisor.`
+# `#03 IAM,User,Group,MFA,AWS-CLI`
 
 <br>
+
+### **IAM (Identity and Access Management)**  
+IAM-এর পূর্ণরূপ হলো **Identity and Access Management**। এটি AWS-এ একটি গ্লোবাল সার্ভিস যা আপনাকে ব্যবহারকারীদের পরিচয় যাচাই (identity) এবং বিভিন্ন রিসোর্সে তাদের অ্যাক্সেস নিয়ন্ত্রণ করতে সাহায্য করে।  
+
+
+### **IAM দিয়ে কী করা যায়?**  
+1. **ব্যবহারকারী এবং গ্রুপ ম্যানেজমেন্ট**  
+2. **পারমিশন নিয়ন্ত্রণ**  
+3. **AWS রিসোর্সের নিরাপত্তা নিশ্চিত করা**  
+4. **রোল তৈরি এবং নির্দিষ্ট অ্যাক্সেস দেওয়া**  
+
+
+### **Root User এবং IAM কেন ব্যবহার করব?**  
+- **Root User**:  
+  যখন আমরা AWS অ্যাকাউন্ট তৈরি করি, তখন আমরা "Root User" হিসাবে লগইন করি। Root User-এর সর্বোচ্চ পারমিশন থাকে এবং এটি সংবেদনশীল কাজের জন্য ব্যবহার করা উচিত, যেমন বিলিং ম্যানেজমেন্ট বা অ্যাকাউন্ট সেটআপ।  
+  **কিন্তু:** নিরাপত্তার জন্য Root User দিয়ে প্রতিদিনের কাজ করা ঠিক নয়।  
+   
+- **IAM User**:  
+  Root User থেকে আলাদা, IAM User নির্দিষ্ট কাজ বা রিসোর্সে সীমিত অ্যাক্সেস পায়। এই কারণে, নিরাপত্তা ও ব্যবস্থাপনা সহজ হয়।  
+
+
+### **User এবং Group কী?**
+1. **User (ব্যবহারকারী)**:  
+   ব্যবহারকারী হলো একটি ব্যক্তিগত পরিচিতি যা AWS-এ নির্দিষ্ট কাজ করার জন্য তৈরি করা হয়।  
+   উদাহরণ: ইয়াসিন নামে একটি ব্যবহারকারী তৈরি করা হয়েছে, যাকে শুধুমাত্র S3 বালতি ম্যানেজ করার পারমিশন দেওয়া হয়েছে।  
+
+2. **Group (গ্রুপ)**:  
+   গ্রুপ হলো একাধিক ব্যবহারকারীকে একত্রিত করার একটি পদ্ধতি। গ্রুপের মাধ্যমে একাধিক ব্যবহারকারীকে একই পারমিশন দেওয়া যায়।  
+   উদাহরণ: "ডেভেলপার" নামে একটি গ্রুপ তৈরি করা হয়েছে, যেখানে ইয়াসিন ও আরাফাত অন্তর্ভুক্ত রয়েছে।  
+
+
+### **গ্রুপ ব্যবহারের সুবিধা:**  
+- গ্রুপের মাধ্যমে একাধিক ব্যবহারকারীকে একই পারমিশন দেওয়া সহজ।  
+- প্রতিটি ব্যবহারকারীর জন্য আলাদা আলাদা পারমিশন সেট করার পরিবর্তে, একটি গ্রুপে অ্যাড করে তাদের একই রকম অ্যাক্সেস দেওয়া যায়।  
+
+
+### **কীভাবে User তৈরি করবেন?**  
+1. **Step 1: AWS Management Console-এ লগইন করুন।**  
+2. **Step 2: IAM সেকশনে যান।**  
+3. **Step 3: "Users" অপশন থেকে "Add User" ক্লিক করুন।**  
+4. **Step 4: নতুন ব্যবহারকারীর নাম (যেমন: Yasin) লিখুন এবং লগইন টাইপ (কনসোল অ্যাক্সেস বা প্রোগ্রাম্যাটিক অ্যাক্সেস) নির্বাচন করুন।**  
+5. **Step 5: পারমিশন সেট করুন।**  
+6. **Step 6: ব্যবহারকারীর জন্য পাসওয়ার্ড তৈরি করুন এবং এটি সংরক্ষণ করুন।**  
+
+
+### **কীভাবে গ্রুপ তৈরি করবেন এবং পারমিশন অ্যাসাইন করবেন?**  
+1. **Step 1: IAM কনসোলে যান।**  
+2. **Step 2: "Groups" অপশনে ক্লিক করুন এবং "Create New Group" সিলেক্ট করুন।**  
+3. **Step 3: গ্রুপের নাম দিন (যেমন: Developer)।**  
+4. **Step 4: গ্রুপে প্রয়োজনীয় পারমিশন যোগ করুন (যেমন: S3 Full Access)।**  
+5. **Step 5: গ্রুপ তৈরি হয়ে গেলে, ব্যবহারকারী (Yasin এবং Arafat) এই গ্রুপে যোগ করুন।**  
+
+
+### **কীভাবে Yasin এবং Arafat-কে গ্রুপে যোগ করবেন?**  
+1. IAM-এ "Users" সেকশনে যান।  
+2. Yasin-এর প্রোফাইলে ক্লিক করুন।  
+3. "Add to Group" অপশন থেকে "Developer" গ্রুপ সিলেক্ট করুন।  
+4. একইভাবে Arafat-এর জন্য করুন।  
+
+
+### **গ্রুপ ব্যবহারের উদাহরণ:**  
+ধরুন, আপনি একটি "S3 Full Access" গ্রুপ তৈরি করেছেন এবং ইয়াসিন এবং আরাফাতকে এতে যোগ করেছেন। এই গ্রুপের পারমিশন অনুযায়ী, ইয়াসিন এবং আরাফাত উভয়েই S3 বালতি ম্যানেজ করতে পারবে। এতে আলাদাভাবে প্রত্যেক ব্যবহারকারীর জন্য পারমিশন সেট করার ঝামেলা থাকে না।  
+
+
+### **IAM-এর সুবিধা এবং সীমাবদ্ধতা:**  
+#### **সুবিধা:**  
+1. ব্যবহারকারীদের জন্য নির্দিষ্ট এবং সুনির্দিষ্ট পারমিশন সেট করা যায়।  
+2. রিসোর্সে অ্যাক্সেস নিয়ন্ত্রণ করা সহজ।  
+3. গ্রুপ ব্যবহারের মাধ্যমে ব্যবস্থাপনা দ্রুত এবং কার্যকর।  
+
+#### **সীমাবদ্ধতা:**  
+1. এটি সঠিকভাবে সেটআপ করতে না পারলে নিরাপত্তা ঝুঁকি থাকতে পারে।  
+2. IAM কনফিগারেশনের জন্য সময় এবং অভিজ্ঞতা প্রয়োজন।  
+
+<br>
+
+**Also see this topics:**
+- #### **MFA**
+- #### **Different ways of using services**
+- #### **Use CLI**
+- #### **CLI Configuration with Access key**
+- #### **Change Password setting from IAM**
+
+
+
+<br>
+<br>
+
+# `#04 AWS: `
+
+<br>
+<br>
+
+### **Some information about AWS EC2:**
+
+- AWS EC2(Amazon Elastic Compute Cloud) is a cloud service that provides resizable virtual servers, called instances, which you can use to run applications.
+
+- Imagine you're running a business and need a server to host your website or application. Instead of buying and managing physical servers, AWS EC2 lets you rent virtual servers in the cloud. These virtual servers are called instances.
+
+- We can control the type of OS, RAM, CPU, Disk Space, Network/Firewall .
+
+### **Some import terms about AWS EC2 SERVER:**
+
+- **Instance Type:** Select the hardware capacity(e.g. CPU,Memory)
+
+- **AMI(Amazon Machine Image):** Choose the operating system and software (linux,mac,windows).
+
+- **Storage:** Configure the type and size of storage(e.g. EBS Volume).
+
+- **Security Gropus:** Set up firewall rules to control inbound/outbound traffic.
+
+- **Key Pair:** Create or use an existing key pair for SSH access.
+
+- **Network Settings: Configure VPC, subnet and assign public or private IP addresses.
+
+- **IAM Role:** Attach an IAM role for permissions to access other AWS resources.
+
+- **User Data:** Add scripts to be executed when the instance starts.
+
+- **Elastic IP:** Optionally associate a static IP address for consistent public access.
+
+
+
