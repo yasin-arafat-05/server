@@ -85,7 +85,7 @@ Nginx অ্যাপ্লিকেশন সার্ভারের জন্
 
 Uvicorn হলো একটি ASGI (Asynchronous Server Gateway Interface) সার্ভার যা ডাইনামিক অ্যাপ্লিকেশন পরিবেশনে ব্যবহৃত হয়। কিন্তু এটি স্ট্যাটিক ফাইল সার্ভিং বা লোড ব্যালেন্সিং-এর মতো কাজের জন্য উপযুক্ত নয়। Nginx এই কাজগুলো দক্ষতার সাথে করতে পারে।  
 
-
+<br>
 <br>
 <br>
 
@@ -114,11 +114,11 @@ sudo systemctl start nginx
 
 `Now, localhost in a browser, we will see nginx server is up and running. `
 
-
 <br>
 <br>
+<br>
 
-# `#03 How we see the welcome page: `
+# `#03 Welcome Page and Configuration File: `
 
 <br>
 
@@ -271,7 +271,7 @@ http {
 
 ##### **1. Global Settings:**
 ```nginx
-worker_processes  1;
+worker_processes  1; # let's change it to auto
 ```
 - **ব্যাখ্যা:** 
   - সার্ভার একসাথে কতগুলো প্রক্রিয়া চালাবে তা নির্ধারণ করা হয়েছে। 
@@ -284,7 +284,7 @@ events {
 }
 ```
 - **ব্যাখ্যা:**
-  - একেকটি worker প্রক্রিয়া সর্বোচ্চ ১০২৪টি কানেকশন(মূলত ইউজারের রিকোয়েস্ট বোঝায়) পরিচালনা করতে পারবে।
+  - একেকটি worker প্রক্রিয়া (worker process) সর্বোচ্চ ১০২৪টি কানেকশন(মূলত ইউজারের রিকোয়েস্ট বোঝায়) পরিচালনা করতে পারবে।
 
 ##### **3. http:**
 ```nginx
@@ -341,4 +341,27 @@ server {
 3. **Error Handling:** ত্রুটি কোডগুলোর জন্য `/50x.html` পৃষ্ঠায় রিডাইরেক্ট করবে।
 4. **Worker Connections:** এক প্রক্রিয়া সর্বোচ্চ ১০২৪টি কানেকশন পরিচালনা করবে।
 5. **Performance Optimization:** `sendfile` চালু এবং `keepalive_timeout` ৬৫ সেকেন্ড সেট করা হয়েছে।
+
+
+
+<br>
+<br>
+<br>
+
+# `#04 Change in Configuration File: `
+
+<br>
+
+After changing something in nginx configuration file. If we restart our nginx server then there will be some downtime. So, we'll not restart our nginx server.So, we can do the following step:
+
+**1. 1st, we will change see what we change is right or not:**
+```bash
+sudo nginx -t
+```
+If everything is alright then we can reload our nginx server. `Remember, if we have got an error with the first command. After that if we will reload the nginx server . Then, our nginx server will be crushed and we will see downtime in our websites.`
+
+**2. Reload nginx Server:**
+```bash
+sudo systemctl reload nginx 
+```
 
