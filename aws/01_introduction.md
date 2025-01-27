@@ -220,7 +220,7 @@ IAM-এর পূর্ণরূপ হলো **Identity and Access Management**
 <br>
 <br>
 
-# `#04 AWS: `
+# `#04 AWS EC2 (Amazon Elastic Computing): `
 
 <br>
 <br>
@@ -253,5 +253,151 @@ IAM-এর পূর্ণরূপ হলো **Identity and Access Management**
 
 - **Elastic IP:** Optionally associate a static IP address for consistent public access.
 
+### `Make a EC2`
+
+- 1. In the search bar search EC2
+- 2. Launch Instance
+- 3. Region: `(we we create a instance. If, our location is in india. Then, it's build on india data center of AWS)`
+- 4. Then, `Name and Tag` then `AMI(Amazon Machine Image)->Here, i select Amazon Linux.`  
+- 5. Instance type default "micro instance type" by clicking we can change it.
+- 6. key pair (login) : (by using this we can sequrly connet our instance).
+- 7. Network setting: ()
+- 8. Advance option: (user data) pase the script below:
+
+```bash
+#!/bin/bash 
+
+sudo yum update -y
+sudo systemctl start httpd
+sudo systemctl enable httpd
+
+######
+# create a simple html file verify the web server:
+echo "<html><h1>Welcome to Apache Web Server of Amazon LInux! </h1></html>" > /var/www/html/index.html
+
+```
+
+### **AWS EC2-এর Inbound এবং Outbound Rules Explained in Bangla**
+
+**Security Group** হলো AWS EC2 instance-এর জন্য একটি ভার্চুয়াল ফায়ারওয়াল। এটি **Inbound Rules** এবং **Outbound Rules** ব্যবহার করে নেটওয়ার্ক ট্রাফিক নিয়ন্ত্রণ করে। 
 
 
+### ১. **Inbound Rules**:
+Inbound Rules নির্ধারণ করে কোন ট্রাফিক (ডেটা বা রিকোয়েস্ট) EC2 instance-এর দিকে আসতে পারবে। অর্থাৎ, **কোনো সার্ভিসে অ্যাক্সেস দিতে হলে Inbound Rules সেট করতে হবে।**
+
+#### **উদাহরণ**:
+তুমি যদি তোমার instance-এ একটি **Apache HTTP Server** চালু করো, তাহলে Inbound Rule-এ HTTP (port 80)-এর অনুমতি দিতে হবে।
+
+#### **Inbound Rule সেট করার উদাহরণ**:
+- **HTTP Access**:
+  - Protocol: TCP
+  - Port: 80
+  - Source: `0.0.0.0/0` (সারা বিশ্বের জন্য উন্মুক্ত) অথবা `203.0.113.0/24` (নির্দিষ্ট IP রেঞ্জের জন্য)
+  
+- **SSH Access**:
+  - Protocol: TCP
+  - Port: 22
+  - Source: `0.0.0.0/0` (সতর্কতাঃ এটি নিরাপত্তাহীন হতে পারে। শুধু তোমার IP উল্লেখ করো।)
+
+#### **Inbound Rules চেক করার ধাপ**:
+1. **AWS Console** > **EC2 Dashboard** > **Security Groups**-এ যাও।
+2. তোমার instance-এর Security Group সিলেক্ট করো।
+3. **Inbound Rules** ট্যাব থেকে দেখো বা নতুন Rule অ্যাড করো।
+
+
+### ২. **Outbound Rules**:
+Outbound Rules নির্ধারণ করে কোন ট্রাফিক EC2 instance থেকে বাইরে যেতে পারবে। অর্থাৎ, তোমার instance যদি ইন্টারনেটে অ্যাক্সেস নিতে চায়, তাহলে Outbound Rule সেট করতে হবে।
+
+#### **উদাহরণ**:
+তুমি যদি তোমার instance থেকে **ইন্টারনেট বা অন্য সার্ভার**-এ রিকোয়েস্ট পাঠাতে চাও, তাহলে Outbound Rule-এ `0.0.0.0/0` উল্লেখ করতে হবে।
+
+#### **Default Outbound Rule**:
+AWS Security Group সাধারণত ডিফল্টভাবে Outbound Traffic-এর জন্য সব অনুমতি দেয়। উদাহরণ:
+- Protocol: All
+- Port Range: All
+- Destination: `0.0.0.0/0` (সব জায়গায় ট্রাফিক পাঠানোর অনুমতি)
+
+
+### ৩. **Inbound এবং Outbound Rules-এর পার্থক্য**:
+| **Aspect**         | **Inbound Rule**                                       | **Outbound Rule**                                        |
+|---------------------|--------------------------------------------------------|---------------------------------------------------------|
+| **Traffic Direction** | বাহির থেকে EC2 instance-এ ট্রাফিক প্রবেশ করতে দেয়।       | EC2 instance থেকে বাইরে ট্রাফিক পাঠানোর অনুমতি দেয়।        |
+| **Example Use Case** | SSH, HTTP, HTTPS অ্যাক্সেস।                            | ইন্টারনেট অ্যাক্সেস বা ডেটা API-তে পাঠানো।               |
+| **Default Rule**     | সব ব্লক করা (কিছু অনুমতি দিলে, তখনই অনুমতি পায়)।         | ডিফল্টভাবে সব অনুমোদিত।                                  |
+
+
+### ৪. **প্রায়োগিক উদাহরণ**:
+তোমার EC2 instance-এ একটি Apache Web Server (HTTP) চালু করতে হলে:
+1. **Inbound Rule**: HTTP (port 80) ট্রাফিকের জন্য `0.0.0.0/0` অথবা নির্দিষ্ট IP।
+2. **Outbound Rule**: ডিফল্ট `0.0.0.0/0` (ইন্টারনেট অ্যাক্সেসের জন্য)।
+
+#### **HTTP Access-এর জন্য Inbound Rule**:
+```plaintext
+Type: HTTP
+Protocol: TCP
+Port: 80
+Source: 0.0.0.0/0
+```
+
+#### **Outbound Rule ডিফল্টভাবে**:
+```plaintext
+Type: All traffic
+Protocol: All
+Port: All
+Destination: 0.0.0.0/0
+```
+
+### ৫. **নিরাপত্তার জন্য টিপস**:
+1. SSH Access (port 22)-এ **সারা বিশ্বে উন্মুক্ত** (0.0.0.0/0) না করে, শুধুমাত্র তোমার নির্দিষ্ট **Public IP**-এর জন্য সীমাবদ্ধ করো।
+2. **Inbound Rules**-এ অপ্রয়োজনীয় রুল যুক্ত করো না।
+3. HTTPS (port 443)-এর জন্য Inbound Rule ব্যবহার করো যদি সিকিওর সার্ভার সেটআপ করা হয়।
+
+
+<br>
+<br>
+
+# `#05 AWS EC2 (SSH Connection): `
+
+<br>
+<br>
+
+### **For windows use `putty software`**
+- `1st open puTTYgen, then load then save private file(in .ppk format).`
+- `Now, open putty software, in host name or ip address use public ipv4 address .`
+- `Left side select SSH->Auth->Credential->(private key file for authenticator)->(load the file in .ppk format)->click open.`
+- `Type ec2-user`
+
+<br>
+
+### **For linux:**
+#### ১. **ফাইলের পারমিশন ঠিক করা:**
+```bash
+chmod 400 first_key.pem
+```
+এটি `.pem` ফাইলকে শুধুমাত্র তোমার ব্যবহার করার অনুমতি দেবে (read-only)। 
+
+#### ২. **পুনরায় SSH করার চেষ্টা করো:**
+```bash
+ssh -i first_key.pem ec2-user@13.215.202.1
+```
+
+**NOTE: EC2 is region specific. If we change the region then we can't see the instance of another region. That's why we can view the global ec2 dashboard.**
+
+<br>
+
+`We use t2.micro for learning purpose. But, for some more specific use case we need:`
+
+<br>
+
+![image](../img/img02.png)
+
+<br>
+
+### [aws_all_instance_types_with_pricing](https://aws.amazon.com/ec2/instance-types/)
+
+<br>
+
+### Purchase option: 
+
+![image](../img/img03.png)
+![image](../img/img04.png)
