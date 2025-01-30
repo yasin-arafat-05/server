@@ -5,6 +5,7 @@
 # `#01 Virtualization, Hypervisor, Type of Hypervisor.`
 
 <br>
+<br>
 
 ### ভার্চুয়ালাইজেশন কী?  
 ভার্চুয়ালাইজেশন হলো একটি প্রযুক্তি যার মাধ্যমে হার্ডওয়্যার বা সফটওয়্যারের রিসোর্সগুলোর একটি ভার্চুয়াল সংস্করণ তৈরি করা হয়। এর মধ্যে অপারেটিং সিস্টেম, স্টোরেজ ডিভাইস, নেটওয়ার্ক রিসোর্স ইত্যাদি অন্তর্ভুক্ত। এটি মূলত একটি ফিজিক্যাল সিস্টেমের উপর ভার্চুয়াল সিস্টেম তৈরি করতে ব্যবহৃত হয়। 
@@ -131,6 +132,7 @@
 
 # `#03 IAM,User,Group,MFA,AWS-CLI`
 
+<br>
 <br>
 
 ### **IAM (Identity and Access Management)**  
@@ -401,3 +403,160 @@ ssh -i first_key.pem ec2-user@13.215.202.1
 
 ![image](../img/img03.png)
 ![image](../img/img04.png)
+
+<br>
+<br>
+
+# `#06 AWS EBS (Elastic Block Store): `
+
+<br>
+<br>
+
+### `Some basic information: `
+- AWS EBS is a cloud-based storeage service that provides durable, high-performance block storage for 
+use with Amazon EC2 instances.It works like a virtual hard drive, allowing you to store and access 
+data even when your EC2 instances are stopped or terminated.
+
+-  For example, if you're hosting a MySQL OR PostgreSQL database, you ned reliable, high-performance storage to handle frequent read/write operations. EBS provides persistent, fast storage that ensures your data is saved even if the EC@ instance is stopped or restarted, making it ideal for database workloads.
+
+
+### `Important points about EBS: `
+
+- Region & AZ specific `(If our ec2 created in Singapur assign a EBS, We can't use that EBS in another ec2 instance that is not created in Singapur.)`
+- Build-in REdundancy
+    - `EBS volumes are automatically replicated within the same Availability Zone to prevent data loss due to hardware failures`.
+- Different Volume Types
+    - gp2/3, io1/2, st1,sc1 `(like: ssd,hdd)`
+- Allow Encryption and Snapshot for backup
+
+- Scalable(Volume can be resizeable)
+    - `No data loss will occur during resizing.` 
+    - `No need to restart the EC2 instance during the process.`
+
+### `Starting with EBS: `
+- 1st create a EC2
+- From EC2 dashboard, go to Elastic Block Store.
+
+### `Termination on Delete:`
+- From EC2 dashboard, when we select an instance, down below, we see the volumne option. In the volume option, we will see `Delete on Termination`. From here we can control when deleting the EC2 we take the storage or not.
+
+### `Task:`
+- First, create a EC2 then create a EBS volume. Then with EC2 connect EBS volume.
+   - `Here, we add extra volume with our EC2 volume, but for using purpouse we need to mount this volume.`
+
+### `Modify volume:`
+- From, EC2 Dashboard, we can modify the volume without restarting our server.
+
+<br>
+
+### `EBS Snapshot or Backup: (What if we want to copy our data to one location to another)` 
+
+Let's say we have a EBS in one region. How can we make a another EC2 instance in another region with same EBS volume. To do this, first we will take a screen shoot.
+
+- First, create a folder, in that folder create a file. `(This is my data).`
+- Then, go to volumes, select the volume, click Actions->Create Snapshot.`(Snapshot status should be complete.because it takes some time to copy all my working data).`
+- Go to snapshot, select the snapshot then Actions-> Create volume from snapshot`(Creating new volume we can change the location, we know EBS volume is location specific. )`.
+
+- Now, create a new instance name (backup_instance), while `(For making this backup instance everything is same but in the network section, go to advance Network Setting then in the subnet section select the zone where we create our new EBS volume.)`
+
+- Now, in the backup_instance EC2 instance connect the EBS volume`(Created with EBS Snapshot)`.
+
+- Now, we need to mount the EBS volume in our backup_instance. Follow the command below: 
+
+   ```bash 
+   sudo file -s /dev/xvdb1
+   ```
+   AWS-এ **`sudo file -s /dev/xvdb1`** কমান্ডটি ব্যবহার করা হয় ডিভাইসের ফাইল সিস্টেম টাইপ বা ডিভাইস সম্পর্কিত তথ্য নির্ণয় করার জন্য। এই কমান্ডটি `/dev/xvdb1` নামে একটি ব্লক ডিভাইস সম্পর্কে তথ্য প্রদান করে। 
+
+   উদাহরণস্বরূপ, এই ডিভাইসটি ফাইল সিস্টেমে ফরম্যাট করা হয়েছে কিনা বা কী ধরনের ফাইল সিস্টেম ব্যবহার করা হয়েছে (যেমন ext4, xfs, ইত্যাদি) তা জানার জন্য এই কমান্ডটি ব্যবহার করা হয়।
+
+   **বাংলায় সংক্ষেপে:**
+   - **`sudo`**: রুট বা সুপারইউজার হিসাবে কমান্ডটি চালায়।
+   - **`file -s`**: একটি ফাইল বা ডিভাইসের টাইপ সম্পর্কে তথ্য দেখায়।
+   - **`/dev/xvdb1`**: এটি একটি ব্লক ডিভাইস, যেমন ইবিএস ভলিউম।
+
+   ### উদাহরণ:
+   আপনার EBS ভলিউমটি ফরম্যাট হয়েছে কিনা তা যাচাই করার জন্য এটি ব্যবহৃত হয়। যদি ভলিউমটি ফরম্যাট না করা থাকে, তবে এটি "data" হিসেবে দেখাবে। ফরম্যাট করা থাকলে এটি ফাইল সিস্টেমের ধরন দেখাবে (যেমন `ext4` বা `xfs`)।
+
+   ```bash
+   sudo mkdir /mnt/mybackup
+   ```
+   ```bash
+   sudo mount -o nouuid /dev/xvdb1 /mnt/mybackup
+   ```
+   ```bash
+   cd /mnt/mybackup
+   ```
+
+### `Unmount :(After finishing our backup we can unmount this)`
+
+```bash
+sudo umount /mnt/mybackup
+sudo umount -l /mnt/mybackup
+```
+
+<br>
+<br>
+
+# `#07 S3 in AWS: `
+
+<br>
+<br>
+
+### **AWS S3 (Simple Storage Service):**  
+**S3** হলো AWS-এর একটি ক্লাউড-ভিত্তিক স্টোরেজ সেবা, যা ডেটা সংরক্ষণ, পরিচালনা এবং পুনরুদ্ধারের জন্য ব্যবহৃত হয়। এটি বড় পরিমাণে ফাইল, ইমেজ, ভিডিও এবং ব্যাকআপ নিরাপদে ও স্কেলেবলি সংরক্ষণ করতে সহায়ক।  
+
+**S3-এর বৈশিষ্ট্য:**  
+- **অবজেক্ট স্টোরেজ:** ডেটা অবজেক্ট আকারে সংরক্ষণ করা হয়।  
+- **বিশ্বব্যাপী ইউনিক নাম:** প্রতিটি **বাকেটের** (Bucket) একটি ইউনিক নাম থাকতে হবে।  
+- **রিজিয়ন স্পেসিফিক:** ডেটা একটি নির্দিষ্ট অঞ্চলে সংরক্ষণ করা হয়।  
+- **কী-ভ্যালু পেয়ার:** প্রতিটি অবজেক্ট একটি **কী-ভ্যালু পেয়ার** হিসেবে সংরক্ষিত হয়।  
+  - **Key:** অবজেক্টের নাম (যা স্ল্যাশ `/` ব্যবহার করে ডিরেক্টরি কাঠামো অনুকরণ করতে পারে)।  
+  - **Value:** অবজেক্টের বিষয়বস্তু বা ডেটা (যেমন ফাইল/তথ্য)।  
+- **ম্যাক্সিমাম অবজেক্ট সাইজ:** একক অবজেক্টের সর্বোচ্চ আকার ৫ টেরাবাইট (5TB)।  
+- **মাল্টিপার্ট আপলোড:** ৫ গিগাবাইটের (5GB) চেয়ে বড় ফাইলের জন্য মাল্টিপার্ট আপলোড ব্যবহার করার পরামর্শ দেওয়া হয় (ফাইলটি ছোট ছোট অংশে ভাগ করে আপলোড করা হয়)।  
+- **ডেটা রেপ্লিকেশন:** ডেটা বিভিন্ন অবস্থানে কপি করে রাখা হয় (যেমন সিঙ্গাপুর অঞ্চলে A, B, C-তে)।  
+- **ডিজাস্টার রিকভারি:** প্রাকৃতিক দুর্যোগের সময় ডেটাবেজ নষ্ট হলে ডেটা পুনরুদ্ধার করার সুবিধা।  
+
+
+### **S3 Bucket কী?**  
+**Bucket** হলো S3-এ ডেটা সংরক্ষণ করার একটি কন্টেইনার। এটি একটি ফোল্ডারের মতো কাজ করে যেখানে আপনি অবজেক্ট (ফাইল) আপলোড এবং সংরক্ষণ করতে পারেন।  
+- **বাকেটের ধরন:**  
+  - **জেনারেল পারপাস:** সাধারণ ডেটা সংরক্ষণের জন্য।  
+  - **ডিরেক্টরি:** স্ল্যাশ `/` ব্যবহার করে ডিরেক্টরি কাঠামো তৈরি করা যায়।  
+
+
+
+### **উদাহরণ:**  
+আপনার `yasin.txt` ফাইলটি যদি সিঙ্গাপুর অঞ্চলে সংরক্ষণ করা হয় এবং কোনো প্রাকৃতিক দুর্যোগে ডেটাবেজ নষ্ট হয়ে যায়, তবে S3-এর ডেটা রেপ্লিকেশন এবং ডিজাস্টার রিকভারি ফিচার ব্যবহার করে ডেটা পুনরুদ্ধার করা যাবে।
+
+
+<br>
+<br>
+
+# `#08 ECS(Elastic Container Service): `
+
+<br>
+<br>
+
+### **Amazon ECS (Elastic Container Service) কি?**  
+Amazon ECS হলো একটি ক্লাউড-ভিত্তিক কন্টেইনার ম্যানেজমেন্ট সার্ভিস, যা আপনাকে **Docker container** চালানো এবং পরিচালনা করার সুযোগ দেয়। এটি **একটি ক্লাস্টার** (virtual servers-এর একটি গ্রুপ) এর উপর আপনার কন্টেইনার চালাতে সাহায্য করে।  
+
+### **কেন ECS ব্যবহার করবেন?**  
+ECS ব্যবহার করলে নিম্নলিখিত কাজগুলো **স্বয়ংক্রিয়ভাবে পরিচালিত হয়**—  
+1. **Creation (সৃষ্টি):** নতুন কন্টেইনার তৈরি ও ডিপ্লয়মেন্ট সহজে করা যায়।  
+2. **Management (পরিচালনা):** আপনার অ্যাপ্লিকেশন কন্টেইনারগুলোর স্বাস্থ্য ও রিসোর্স ব্যবস্থাপনা নিজেই সামলায়।  
+3. **Updating (আপডেট করা):** কন্টেইনারের নতুন ভার্সন রোলআউট সহজে করা যায়, এবং এটি **zero-downtime** বজায় রাখে।  
+
+
+### **ECS vs EC2 (EC2 বনাম ECS)**  
+| বিষয় | **ECS (Elastic Container Service)** | **EC2 (Elastic Compute Cloud)** |  
+|-------|----------------------------------|-----------------------------|  
+| **ব্যবহার** | Docker কন্টেইনার চালানোর জন্য | ভার্চুয়াল মেশিন তৈরি ও চালানোর জন্য |  
+| **ম্যানেজমেন্ট** | AWS স্বয়ংক্রিয়ভাবে পরিচালনা করে | আপনাকে ম্যানুয়ালি সেটআপ করতে হয় |  
+| **স্কেলিং** | অটো-স্কেলিং সহজ | স্কেলিং করতে ম্যানুয়াল কনফিগারেশন লাগে |  
+| **কোস্ট (খরচ)** | ব্যবহার অনুযায়ী বিল করা হয় | ফিক্সড রিসোর্সের জন্য বিল করা হয় |  
+
+## `Free Tier is not available for ECS`
+
+
